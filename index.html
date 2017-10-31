@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>梦柯教育-九宫格抽奖</title>
+		<style type="text/css">
+			*{padding: 0;margin: 0;}
+			li{ list-style-type: none;}
+			a{text-decoration: none;}
+			
+			#boxDom{ width: 684px; height: 684px; background:url(img/bg.jpg) no-repeat center; 
+			margin:20px auto; position: relative;}
+			#boxDom ul{ padding: 50px 55px;}
+			#boxDom ul li{ width: 142px; height: 142px; float: left;}
+			#boxDom ul li.check{ background: red;}
+			#clicks{ position: absolute; left:197px; top: 192px; width: 284px; height: 284px; 
+			}
+		</style>
+	</head>
+	<body>
+		
+		<div id="boxDom">
+			<a id="clicks" href="##"></a>
+			<ul>
+				<li class="mk mk-0"><img src="img/1.png"/></li>
+				<li class="mk mk-1"><img src="img/4.png"/></li>
+				<li class="mk mk-2"><img src="img/3.png"/></li>
+				<li class="mk mk-3"><img src="img/3.png"/></li>
+				<li class="mk mk-11"><img src="img/7.png"/></li>
+				
+				<li></li>
+				<li></li>
+				
+				<li class="mk mk-4"><img src="img/8.png"/></li>
+				<li class="mk mk-10"><img src="img/4.png"/></li>
+				
+				<li></li>
+				<li></li>
+				
+				<li class="mk mk-5"><img src="img/3.png"/></li>
+				<li class="mk mk-9"><img src="img/5.png"/></li>
+				<li class="mk mk-8"><img src="img/6.png"/></li>
+				<li class="mk mk-7"><img src="img/3.png"/></li>
+				<li class="mk mk-6"><img src="img/4.png"/></li>
+			</ul>
+		</div>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript">
+		
+		
+window.onload = function(){
+	var mk = {
+		form:-1,//起始位置
+		check:-1,//终点位置，中奖的位置
+		cont:0,// 奖品的总个数
+		speed:100,//滚动的速度
+		min:50,//滚动的最小次数
+		cycle:0,//滚动的次数
+		timer:0,//定时器
+		init:function(obj){
+			this.obj = $(obj);
+			this.cont = $(obj).find(".mk").length;
+		},
+		//默认设置 改变 样式
+		roll:function(){
+			var form = this.form;
+			var obj = this.obj;
+			var cont = this.cont;
+			//删除前一个元素的选中样式
+			
+			obj.find(".mk-" + form).removeClass("check");
+			form+=1;
+			if(form>=cont){
+				form = 0;
+			}
+			//添加后一个的选中样式
+			obj.find(".mk-" + form).addClass("check");
+			this.form  = form;
+		},
+		start:function(){
+			this.cycle++;
+			this.roll();
+			//中奖的时候
+			if( this.form == this.check &&  this.cycle > this.min+10 ){
+				//清除定时器，重置样式
+				clearTimeout(this.timer);
+				this.check = -1;
+				this.cycle = 0;
+				this.speed = 100;
+				flag = true;
+			}else{
+				//当滚动的次数 小于 最小滚动的次数的时候
+				if(this.cycle < this.min){
+					//控制速度
+					this.speed -= 10;
+					if(this.speed<40)this.speed = 40;
+				
+				//当滚动的次数 等于  最小滚动的次数的时候
+				}else if(this.cycle == this.min){
+					//随机获取中奖的位置 0-11
+					var index  = Math.floor(Math.random()*this.cont);				
+					this.check = index;
+					
+				//当滚动的次数 大于 最小滚动的次数的时候
+				}else{
+					//  多加10   是为了给一个缓冲期
+					if(this.cycle < this.min + 10){
+						this.speed += 20;
+					}else{
+						this.speed += 60;
+					}
+				}
+				//添加定时器
+				this.timer = setTimeout(function(){
+					mk.start();
+				},this.speed)	
+			}
+			/*
+				1：改变滚动的次数
+				判断：
+				 一： 中奖的时候
+				 	当起始位置 == 中奖的位置的，我们中奖的。  &&
+				 	当滚动的次数 大于 最小滚动的次数的时候， 才能中奖
+				 	清除定时器
+				 	
+				 二：没中奖的时候
+				 	1: 当滚动的次数 小于 最小滚动的次数的时候
+				 		控制滚动的速度  变快
+				 	
+				 	2：当滚动的次数 等于 最小滚动的次数的时候
+				 		check = 需要来设定中奖的位置（随机）
+				 		
+				 	3：当滚动的次数 大于 最小滚动的次数的时候
+				 		控制滚动的速度   变慢
+				
+				 	添加定时器
+			*/
+		}
+	};
+	// 开关 
+	var flag = true;
+	$("#clicks").on("click",function(){
+		if(flag){
+			mk.init( $("#boxDom") );
+			mk.start();
+			flag = false;
+		}
+		
+	});
+
+};
+		
+		
+		
+	</script>
+	</body>
+</html>
